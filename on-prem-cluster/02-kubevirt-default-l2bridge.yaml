@@ -1,0 +1,21 @@
+spec:
+  configuration:
+    network:
+      binding:
+        l2bridge:
+          domainAttachmentType: managedTap
+          migration: {}
+      defaultNetworkInterface: l2bridge
+---
+# Apply with:
+#   kubectl patch kubevirt kubevirt-kubevirt-hyperconverged -n openshift-cnv \
+#     --type=merge --patch-file=02-kubevirt-default-l2bridge.yaml
+#
+# Target: KubeVirt CR (not HyperConverged - it doesn't expose defaultNetworkInterface)
+#
+# This changes the default VM network binding from masquerade to l2bridge.
+# Effect: VMs created via the GUI will default to the l2bridge binding plugin
+# which supports live migration on Layer2 primary UDN namespaces.
+#
+# Note: namespaces without a primary UDN will also default to l2bridge.
+# For those namespaces, masquerade can still be selected manually in the VM spec.

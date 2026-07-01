@@ -1,0 +1,30 @@
+apiVersion: k8s.ovn.org/v1
+kind: ClusterUserDefinedNetwork
+metadata:
+  name: yellow
+  labels:
+    evpn: "true"
+    advertise: "evpn"
+spec:
+  namespaceSelector:
+    matchExpressions:
+      - key: name
+        operator: In
+        values:
+          - blue
+          - yellow
+  network:
+    topology: Layer2
+    layer2:
+      role: Primary
+      ipam:
+        lifecycle: Persistent  ## Means that OVN will provide IPAM for the subnet and persist the MAC and IP addresses. NOT SHOWN in docs.
+      subnets:
+        - 10.100.1.0/24
+    transport: EVPN
+    evpn:
+      vtep: evpn-vtep
+      macVRF:
+        vni: 100
+      ipVRF:
+        vni: 101

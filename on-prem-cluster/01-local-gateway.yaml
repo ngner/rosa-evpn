@@ -1,0 +1,7 @@
+# Merge patch for Network.operator.openshift.io/cluster (VRF-Lite requires local gateway)
+# oc patch network.operator.openshift.io cluster --type=merge -f 01-local-gateway.yaml
+spec:
+  defaultNetwork:
+    ovnKubernetesConfig:
+      gatewayConfig:
+        routingViaHost: true

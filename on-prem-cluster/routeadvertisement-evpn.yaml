@@ -1,0 +1,21 @@
+apiVersion: k8s.ovn.org/v1
+kind: RouteAdvertisements
+metadata:
+  name: advertise-evpn
+spec:
+  targetVRF: auto
+  advertisements:
+    - PodNetwork
+  nodeSelector: {} # ALL NODES
+    # matchLabels:
+    #   kubernetes.io/hostname: worker-0 # just one node for testing
+    #   #node-role.kubernetes.io/worker: "" # OR all workers
+  frrConfigurationSelector:
+    matchLabels:
+      evpn: "true"
+  networkSelectors:
+    - networkSelectionType: ClusterUserDefinedNetworks
+      clusterUserDefinedNetworkSelector:
+        networkSelector:
+          matchLabels:
+            advertise: "evpn"

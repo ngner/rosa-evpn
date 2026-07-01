@@ -1,0 +1,15 @@
+apiVersion: frrk8s.metallb.io/v1beta1
+kind: FRRConfiguration
+metadata:
+  name: underlay-rr-peer
+  namespace: openshift-frr-k8s
+  labels:
+    evpn: "true"
+spec:
+  nodeSelector: {}
+  bgp:
+    routers:
+      - asn: 65512
+        neighbors:
+          - address: 192.168.188.152
+            asn: 65512

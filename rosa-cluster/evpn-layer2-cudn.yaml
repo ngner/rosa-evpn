@@ -1,0 +1,25 @@
+apiVersion: k8s.ovn.org/v1
+kind: ClusterUserDefinedNetwork
+metadata:
+  name: evpn-on-prem-cudn
+  labels:
+    network: "evpn-on-prem"
+spec:
+  namespaceSelector:
+    matchLabels:
+      network: "evpn-on-prem"
+  network:
+    topology: Layer2
+    layer2:
+      ipam:
+        lifecycle: Persistent
+        mode: Enabled
+      role: Primary
+      subnets:
+        - 10.100.1.0/24
+    transport: EVPN
+    evpn:
+      vtep: evpn-vtep
+      macVRF:
+        vni: 100
+        routeTarget: 65512:100

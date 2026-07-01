@@ -1,0 +1,15 @@
+apiVersion: k8s.ovn.org/v1
+kind: RouteAdvertisements
+metadata:
+  name: default
+spec:
+  advertisements:
+  - PodNetwork
+  frrConfigurationSelector: {}
+  networkSelectors:
+  - clusterUserDefinedNetworkSelector:
+      networkSelector:
+        matchLabels:
+          advertise: "true"
+    networkSelectionType: ClusterUserDefinedNetworks
+  nodeSelector: {}

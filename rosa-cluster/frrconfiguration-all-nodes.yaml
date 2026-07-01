@@ -1,0 +1,60 @@
+# BGP peering with the AWS VPC underlay routers.
+# ENVIRONMENT-SPECIFIC: The neighbor addresses below are the VPC router IPs
+# for each availability zone. Update these to match your AWS VPC configuration.
+# Find them with: oc get nodes -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="InternalIP")].address}{"\n"}{end}'
+# Then identify the VPC router (gateway) for each subnet.
+apiVersion: frrk8s.metallb.io/v1beta1
+kind: FRRConfiguration
+metadata:
+  name: all-nodes
+  namespace: openshift-frr-k8s
+spec:
+  bgp:
+    routers:
+    - asn: 65512
+      neighbors:
+      - address: 10.0.1.51
+        asn: 65000
+        disableMP: true
+        dualStackAddressFamily: false
+        toReceive:
+          allowed:
+            mode: all
+      - address: 10.0.1.27
+        asn: 65000
+        disableMP: true
+        dualStackAddressFamily: false
+        toReceive:
+          allowed:
+            mode: all
+      - address: 10.0.2.137
+        asn: 65000
+        disableMP: true
+        dualStackAddressFamily: false
+        toReceive:
+          allowed:
+            mode: all
+      - address: 10.0.2.22
+        asn: 65000
+        disableMP: true
+        dualStackAddressFamily: false
+        toReceive:
+          allowed:
+            mode: all
+      - address: 10.0.3.132
+        asn: 65000
+        disableMP: true
+        dualStackAddressFamily: false
+        toReceive:
+          allowed:
+            mode: all
+      - address: 10.0.3.27
+        asn: 65000
+        disableMP: true
+        dualStackAddressFamily: false
+        toReceive:
+          allowed:
+            mode: all
+  nodeSelector:
+    matchLabels:
+      bgp_router: "true"

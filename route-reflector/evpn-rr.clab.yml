@@ -1,0 +1,21 @@
+# iBGP Route Reflector for cross-cluster EVPN peering.
+# Connects to host br0 bridge (192.168.188.0/24).
+# Deploy: sudo containerlab deploy -t evpn-rr.clab.yml && ./attach-to-br0.sh
+
+name: evpn-rr
+
+topology:
+  nodes:
+    rr:
+      kind: linux
+      image: quay.io/frrouting/frr:10.5.1
+      binds:
+        - rr/daemons:/etc/frr/daemons
+        - rr/frr.conf:/etc/frr/frr.conf
+        - rr/vtysh.conf:/etc/frr/vtysh.conf
+        - rr/boot.sh:/etc/frr/boot.sh
+      exec:
+        - sh /etc/frr/boot.sh
+
+  links:
+    - endpoints: ["rr:eth1", "host:clab-evpn-rr-br0"]

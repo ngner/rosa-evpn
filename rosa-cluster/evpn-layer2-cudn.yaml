@@ -22,4 +22,5 @@ spec:
       vtep: evpn-vtep
       macVRF:
         vni: 100
-        routeTarget: 65512:100
+      ipVRF:
+        vni: 101

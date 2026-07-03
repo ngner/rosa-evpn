@@ -1,19 +1,28 @@
 # Lessons Learned and Troubleshooting
 
+## ROSA Dynamic Node IPs is a pain for BGP peers
+
+A route refelctor with IP range for peers was a great answer.  Which also solved inbound BGP TCP connections issue below.
+
+
 ## FRR-k8s Cannot Accept Inbound BGP
 
-FRR-k8s pods listen on port 50179 internally (not 179). There is no
+FRR-k8s pods listen on port 50179 internally (not 179 externally). There is no
 DNAT rule or Kubernetes Service exposing port 179 to external peers.
 This means both ends of a cross-cluster BGP peering can only
 **initiate outbound** connections — they cannot receive them.
 
 **Solution**: Deploy an iBGP Route Reflector (e.g. Containerlab FRR) that
-listens on standard port 179. Both clusters connect outbound to the RR.
+listens on standard port 179. Both clusters connect outbound to the RR (also solve dynamic IP issue).
 
 ## Default VRF frrConfiguration nodeselectors
 
-If you advertise routes in the default VRF (`frrConfigurationSelector: {}`)
+We have to use FRR rawconfig to enable the right type of redistribution and learning routes back in to the EVPN VRF is not yet tested (DEFAULT ??).  Need to consider overlaps of IP ranges in ROSA maybe as well.
+Acceptable path for routing, onsite vs ROSA, should just manage itself.
+If you advertise routes in the default VRF (`frrConfigurationSelector: {}`) 
 it will match ALL FRRConfigurations. Need to test further on these Frr cofnigs.
+
+
 
 ## Node Selector Considerations on ROSA
 

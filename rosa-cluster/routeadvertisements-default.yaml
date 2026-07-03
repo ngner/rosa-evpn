@@ -1,3 +1,6 @@
+# NOT USED: OVN-K rejects RouteAdvertisements for EVPN networks in the default
+# VRF. Instead, VRF route leaking is configured via raw FRR config in
+# frrconfiguration-all-nodes.yaml to import the CUDN subnet into default VRF BGP.
 apiVersion: k8s.ovn.org/v1
 kind: RouteAdvertisements
 metadata:
@@ -5,7 +8,9 @@ metadata:
 spec:
   advertisements:
   - PodNetwork
-  frrConfigurationSelector: {}
+  frrConfigurationSelector:
+    matchLabels:
+      peering: "aws"
   networkSelectors:
   - clusterUserDefinedNetworkSelector:
       networkSelector:

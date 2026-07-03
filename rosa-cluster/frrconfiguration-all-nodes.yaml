@@ -3,11 +3,16 @@
 # for each availability zone. Update these to match your AWS VPC configuration.
 # Find them with: oc get nodes -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="InternalIP")].address}{"\n"}{end}'
 # Then identify the VPC router (gateway) for each subnet.
+
+# See line 87 onwards for the EVPN VRF to Default VRF routing.
+
 apiVersion: frrk8s.metallb.io/v1beta1
 kind: FRRConfiguration
 metadata:
   name: all-nodes
   namespace: openshift-frr-k8s
+  labels:
+    peering: "aws"
 spec:
   bgp:
     routers:
@@ -20,6 +25,10 @@ spec:
         toReceive:
           allowed:
             mode: all
+        toAdvertise:
+          allowed:
+            prefixes:
+            - 10.100.1.0/24
       - address: 10.0.1.27
         asn: 65000
         disableMP: true
@@ -27,6 +36,10 @@ spec:
         toReceive:
           allowed:
             mode: all
+        toAdvertise:
+          allowed:
+            prefixes:
+            - 10.100.1.0/24
       - address: 10.0.2.137
         asn: 65000
         disableMP: true
@@ -34,6 +47,10 @@ spec:
         toReceive:
           allowed:
             mode: all
+        toAdvertise:
+          allowed:
+            prefixes:
+            - 10.100.1.0/24
       - address: 10.0.2.22
         asn: 65000
         disableMP: true
@@ -41,6 +58,10 @@ spec:
         toReceive:
           allowed:
             mode: all
+        toAdvertise:
+          allowed:
+            prefixes:
+            - 10.100.1.0/24
       - address: 10.0.3.132
         asn: 65000
         disableMP: true
@@ -48,6 +69,10 @@ spec:
         toReceive:
           allowed:
             mode: all
+        toAdvertise:
+          allowed:
+            prefixes:
+            - 10.100.1.0/24
       - address: 10.0.3.27
         asn: 65000
         disableMP: true
@@ -55,6 +80,27 @@ spec:
         toReceive:
           allowed:
             mode: all
+        toAdvertise:
+          allowed:
+            prefixes:
+            - 10.100.1.0/24
+      prefixes:
+      - 10.100.1.0/24
+  raw:
+  ## This the intresting part
+    rawConfig: |
+      router bgp 65512 vrf mp3-udn-vrf
+       address-family ipv4 unicast
+        redistribute connected
+       exit-address-family
+      exit
+      !
+      router bgp 65512
+       address-family ipv4 unicast
+        import vrf mp3-udn-vrf
+       exit-address-family
+      exit
+      !
   nodeSelector:
     matchLabels:
       bgp_router: "true"

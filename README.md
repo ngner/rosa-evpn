@@ -37,11 +37,11 @@ VXLAN-encapsulated data plane traffic flows directly between VTEP IPs.
 | Component | Version |
 |-----------|---------|
 | OpenShift (on-prem) | 4.22+ |
-| ROSA | 4.18+ with OVN-Kubernetes |
+| ROSA | 4.22+ with OVN-Kubernetes |
 | OpenShift Virtualization (KubeVirt) | 4.22+ |
 | FRR-k8s (MetalLB operator) | Installed on both clusters |
 | Containerlab | v0.56+ |
-| Site-to-site connectivity | VPN or direct link between 192.168.188.0/24 and AWS VPC |
+| Site-to-site connectivity | VPN or direct link between on prem (here 192.168.188.0/24) and AWS VPC (here 10.0.[1,2,3].0/24) |
 
 ## Directory Layout
 
@@ -55,6 +55,8 @@ VXLAN-encapsulated data plane traffic flows directly between VTEP IPs.
 ## Deployment Order
 
 ### 1. Deploy the Route Reflector
+
+!NOTE - to be deployed on a node on-prem at present (in this case in 192.168.188.152)
 
 ```bash
 cd route-reflector
@@ -76,7 +78,7 @@ oc patch network.operator.openshift.io cluster \
   --type=merge --patch-file on-prem-cluster/01-local-gateway.yaml
 
 # Configure KubeVirt l2bridge binding
-kubectl patch kubevirt kubevirt-kubevirt-hyperconverged -n openshift-cnv \
+oc patch kubevirt kubevirt-kubevirt-hyperconverged -n openshift-cnv \
   --type=merge --patch-file on-prem-cluster/02-kubevirt-default-l2bridge.yaml
 
 # Deploy EVPN networking
@@ -86,6 +88,7 @@ oc apply -f on-prem-cluster/frrconfiguration-peering-rosa.yaml
 oc apply -f on-prem-cluster/routeadvertisement-evpn.yaml
 
 # Deploy test VM
+# presumes a namespace with request primary cudn labels etc.
 oc apply -f on-prem-cluster/vm-yellow-1.yaml
 ```
 
@@ -106,14 +109,16 @@ oc patch hyperconverged kubevirt-hyperconverged -n openshift-cnv \
 oc apply -f rosa-cluster/namespace-evpn-on-prem.yaml
 oc apply -f rosa-cluster/evpn-layer2-cudn.yaml
 oc apply -f rosa-cluster/evpn-vtep.yaml
-oc apply -f rosa-cluster/frrconfiguration-all-nodes.yaml
 oc apply -f rosa-cluster/frrconfiguration-on-prem-evpn.yaml
-oc apply -f rosa-cluster/routeadvertisements-default.yaml
 oc apply -f rosa-cluster/routeadvertisement-evpn-cudn.yaml
 
 
 # Deploy test VM
 oc apply -f rosa-cluster/vm-test-evpn.yaml
+
+## Enable BGP with AWS route-server (not fully tested)
+oc apply -f rosa-cluster/frrconfiguration-all-nodes.yaml
+oc apply -f rosa-cluster/routeadvertisements-default.yaml
 ```
 
 ### 4. Verify
@@ -148,6 +153,7 @@ annotations to avoid collisions in production.
 
 - IPAM address collisions are possible when both clusters auto-assign from the same /24
 - The `frrconfiguration-all-nodes.yaml` on ROSA contains environment-specific AWS VPC router IPs that must be updated per deployment
+    - Example Terrraform exists to handle this which I hope to get hold of.
 - VTEP-to-VTEP reachability depends on VPN routing tables including the correct CIDRs
 - FRR-k8s `nodeSelector: bgp_router: "true"` label must be applied to ROSA nodes participating in EVPN
 

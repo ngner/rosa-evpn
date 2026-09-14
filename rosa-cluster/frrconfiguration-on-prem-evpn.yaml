@@ -1,17 +1,32 @@
+---
 apiVersion: frrk8s.metallb.io/v1beta1
 kind: FRRConfiguration
 metadata:
-  name: on-prem-evpn
+  name: evpn-bgp
   namespace: openshift-frr-k8s
   labels:
     evpn-peering: "on-prem"
 spec:
   bgp:
     routers:
-    - asn: 65512
+    - asn: 65021
       neighbors:
-      - address: 192.168.188.152
-        asn: 65512
-  nodeSelector:
-    matchLabels:
-      bgp_router: "true"
+      - address: 10.101.103.3
+        asn: 65004
+        ebgpMultiHop: true
+        disableMP: false
+        dualStackAddressFamily: false
+        toReceive:
+          allowed:
+            mode: all
+      - address: 10.101.103.4
+        asn: 65004
+        ebgpMultiHop: true
+        disableMP: false
+        dualStackAddressFamily: false
+        toReceive:
+          allowed:
+            mode: all
+  nodeSelector: {}
+    # matchLabels:
+    #   bgp_router: "true"

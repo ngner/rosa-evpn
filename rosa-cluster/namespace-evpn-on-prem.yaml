@@ -4,4 +4,15 @@ metadata:
   name: evpn-on-prem-vms
   labels:
     network: "evpn-on-prem"
+    primary-cudn: blue-320
     k8s.ovn.org/primary-user-defined-network: ""
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: blue
+  labels:
+    k8s.ovn.org/primary-user-defined-network: ''
+    kubernetes.io/metadata.name: blue
+    localnet-vlan319: cudns
+    primary-cudn: blue-320

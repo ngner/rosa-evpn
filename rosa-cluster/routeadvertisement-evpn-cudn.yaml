@@ -15,4 +15,4 @@ spec:
       clusterUserDefinedNetworkSelector:
         networkSelector:
           matchLabels:
-            network: "evpn-on-prem"
+            evpn: "true"

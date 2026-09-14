@@ -3,8 +3,6 @@ kind: VTEP
 metadata:
   name: evpn-vtep
 spec:
-  cidrs: 
-   - 10.0.1.0/24
-   - 10.0.2.0/24
-   - 10.0.3.0/24
+  cidrs:
+   - 10.10.0.0/17
   mode: Unmanaged

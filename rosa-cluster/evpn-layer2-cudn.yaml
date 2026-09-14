@@ -6,21 +6,32 @@ metadata:
     network: "evpn-on-prem"
 spec:
   namespaceSelector:
-    matchLabels:
-      network: "evpn-on-prem"
+    matchExpressions:
+      - key: primary-cudn
+        operator: In
+        values:
+          - blue-320
   network:
     topology: Layer2
+    mtu: 1400
     layer2:
+      role: Primary
       ipam:
         lifecycle: Persistent
-        mode: Enabled
-      role: Primary
       subnets:
-        - 10.100.1.0/24
+        - 172.25.220.0/24
+      infrastructureSubnets:
+        - 172.25.220.0/28          # .0–.15: gateway .1, mgmt .2, headroom
+      reservedSubnets:
+        - 172.25.220.16/26         # .16–.79: static IPs (shared with on-prem)
+        - 172.25.220.80/27         # .80–.111: unallocated
+        - 172.25.220.112/27        # .112–.127: unallocated
+        - 172.25.220.128/27        # .128–.159: on-prem auto-assign pool
+        - 172.25.220.192/26        # .192–.255: headroom
+        # ROSA auto-assign pool: 172.25.220.160/27 (.160–.191)
     transport: EVPN
     evpn:
       vtep: evpn-vtep
       macVRF:
-        vni: 100
-      ipVRF:
-        vni: 101
+        vni: 10320
+        routeTarget: 65004:10320

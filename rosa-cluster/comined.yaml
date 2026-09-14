@@ -54,6 +54,8 @@ metadata:
   name: evpn-on-prem-cudn
   labels:
     network: "evpn-on-prem"
+    evpn: "true"
+    advertise: "evpn"
 spec:
   namespaceSelector:
     matchExpressions:
@@ -88,6 +90,9 @@ spec:
       macVRF:
         vni: 10320
         routeTarget: 65004:10320
+      ipVRF:
+        vni: 10000
+        routeTarget: 65004:10000
 ---
 # Namespace must carry the label that cudn-evpn-yellow.yaml selects on:
 #   spec.namespaceSelector.matchExpressions: key=cudns, operator=In, values=[yellow]

@@ -5,3 +5,4 @@ spec:
     ovnKubernetesConfig:
       gatewayConfig:
         routingViaHost: true
+        ipForwarding: Global

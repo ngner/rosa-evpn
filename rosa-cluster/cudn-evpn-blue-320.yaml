@@ -1,7 +1,7 @@
 apiVersion: k8s.ovn.org/v1
 kind: ClusterUserDefinedNetwork
 metadata:
-  name: evpn-on-prem-cudn
+  name: blue-320
   labels:
     network: "evpn-on-prem"
     evpn: "true"
@@ -41,5 +41,5 @@ spec:
         vni: 10320
         routeTarget: 65004:10320
       ipVRF:
-        vni: 10000
+        vni: 50320
         routeTarget: 65004:10000

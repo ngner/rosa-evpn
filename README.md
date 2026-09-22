@@ -107,7 +107,8 @@ oc patch hyperconverged kubevirt-hyperconverged -n openshift-cnv \
 
 # Deploy EVPN networking
 oc apply -f rosa-cluster/namespace-evpn-on-prem.yaml
-oc apply -f rosa-cluster/evpn-layer2-cudn.yaml
+oc apply -f rosa-cluster/cudn-evpn-blue-320.yaml
+oc apply -f rosa-cluster/cudn-evpn-green-319.yaml
 oc apply -f rosa-cluster/evpn-vtep.yaml
 oc apply -f rosa-cluster/frrconfiguration-on-prem-evpn.yaml
 oc apply -f rosa-cluster/routeadvertisement-evpn-cudn.yaml

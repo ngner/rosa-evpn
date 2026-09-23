@@ -20,6 +20,8 @@ spec:
         lifecycle: Persistent
       subnets:
         - 172.25.220.0/24
+      defaultGatewayIPs:
+        - 172.25.220.1
       infrastructureSubnets:
         - 172.25.220.0/28          # .0–.15: gateway .1, mgmt .2, headroom
       reservedSubnets:

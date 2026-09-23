@@ -72,6 +72,8 @@ spec:
         lifecycle: Persistent
       subnets:
         - 172.25.220.0/24
+      defaultGatewayIPs:
+        - 172.25.220.1
       infrastructureSubnets:
         - 172.25.220.0/28          # .0–.15: gateway .1, mgmt .2, headroom
       reservedSubnets:
@@ -90,9 +92,6 @@ spec:
       macVRF:
         vni: 10320
         routeTarget: 65004:10320
-      ipVRF:
-        vni: 50320
-        routeTarget: 65004:10000
 ---
 apiVersion: k8s.ovn.org/v1
 kind: ClusterUserDefinedNetwork
@@ -118,6 +117,8 @@ spec:
         lifecycle: Persistent
       subnets:
         - 172.25.219.0/24
+      defaultGatewayIPs:
+        - 172.25.219.1
       infrastructureSubnets:
         - 172.25.219.0/28          # .0–.15: gateway .1, mgmt .2, headroom
       reservedSubnets:
@@ -136,9 +137,6 @@ spec:
       macVRF:
         vni: 10319
         routeTarget: 65004:10319
-      ipVRF:
-        vni: 50319
-        routeTarget: 65004:10000
 ---
 # Namespace must carry the label that cudn-evpn-yellow.yaml selects on:
 #   spec.namespaceSelector.matchExpressions: key=cudns, operator=In, values=[yellow]

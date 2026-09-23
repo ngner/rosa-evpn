@@ -21,10 +21,10 @@ spec:
         lifecycle: Persistent  ## Means that OVN will provide IPAM for the subnet and persist the MAC and IP addresses. NOT SHOWN in docs.
       subnets:
         - 10.100.1.0/24
+      defaultGatewayIPs:
+        - 10.100.1.1
     transport: EVPN
     evpn:
       vtep: evpn-vtep
       macVRF:
         vni: 100
-      ipVRF:
-        vni: 101

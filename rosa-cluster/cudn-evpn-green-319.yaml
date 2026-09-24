@@ -42,3 +42,7 @@ spec:
       macVRF:
         vni: 10319
         routeTarget: 65004:10319
+      # Join fabric Vrf_CORE (catalog T4) for routing to ESXi / VLAN 320
+      ipVRF:
+        vni: 10000
+        routeTarget: 65004:10000

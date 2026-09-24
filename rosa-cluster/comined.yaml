@@ -137,6 +137,9 @@ spec:
       macVRF:
         vni: 10319
         routeTarget: 65004:10319
+      ipVRF:
+        vni: 10000
+        routeTarget: 65004:10000
 ---
 # Namespace must carry the label that cudn-evpn-yellow.yaml selects on:
 #   spec.namespaceSelector.matchExpressions: key=cudns, operator=In, values=[yellow]

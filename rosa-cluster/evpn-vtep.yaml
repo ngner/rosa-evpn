@@ -1,8 +1,16 @@
+# VTEP: which local IPs OVN may use as VXLAN tunnel sources (Unmanaged = use
+# existing node addresses that fall in cidrs — do not allocate new ones).
+#
+# ROSA must use the machine/VPC CIDR (here 10.10.0.0/17) so underlay reachability
+# works over the VPN to on-prem. Do NOT copy dl380's 10.101.103.0/24 loopback
+# VTEP range onto ROSA — those IPs are bare-metal Lo0s, not ROSA node IPs.
+#
+# ACM: source-crs/evpn/evpn-vtep-rosa.yaml
 apiVersion: k8s.ovn.org/v1
 kind: VTEP
 metadata:
   name: evpn-vtep
 spec:
   cidrs:
-   - 10.10.0.0/17
+    - 10.10.0.0/17
   mode: Unmanaged

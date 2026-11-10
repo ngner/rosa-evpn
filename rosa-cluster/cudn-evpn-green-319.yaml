@@ -1,9 +1,16 @@
+# CUDN green-319 (VLAN/VNI 319 family on the fabric).
+# macVRF RT 65004:10319 joins fabric L2; ipVRF 20319 is the per-CUDN L3 VRF
+# (not the shared fabric Vrf_CORE L3VNI 10000 — see Learnings.md).
+#
+# IPAM: ROSA owns static .32–.63 and auto-assign .160–.191; other reserved
+# ranges keep dl380 / shared / headroom out of ROSA's allocator.
+#
+# ACM: source-crs/evpn/cudn-evpn-rosa-green-319.yaml
 apiVersion: k8s.ovn.org/v1
 kind: ClusterUserDefinedNetwork
 metadata:
   name: green-319
   labels:
-    network: "evpn-on-prem"
     evpn: "true"
     advertise: "evpn"
 spec:
@@ -17,7 +24,7 @@ spec:
     topology: Layer2
     layer2:
       role: Primary
-      mtu: 1400
+      mtu: 1350
       ipam:
         lifecycle: Persistent
       subnets:
@@ -25,24 +32,22 @@ spec:
       defaultGatewayIPs:
         - 172.25.219.1
       infrastructureSubnets:
-        - 172.25.219.0/28          # .0–.15: gateway .1, mgmt .2, headroom
+        - 172.25.219.0/29          # .0–.7: gateway .1, mgmt .2, headroom
       reservedSubnets:
-        - 172.25.219.16/28         # .16–.31: static IPs (shared)
-        - 172.25.219.32/27         # .32–.63: static IPs (shared)
-        - 172.25.219.64/28         # .64–.79: static IPs (shared)
-        - 172.25.219.80/28         # .80–.95: unallocated
-        - 172.25.219.96/28         # .96–.111: unallocated
-        - 172.25.219.112/28        # .112–.127: unallocated
-        - 172.25.219.128/27        # .128–.159: on-prem auto-assign pool
+        - 172.25.219.8/29          # .8–.15: static assignment only (MTV preserveStaticIPs)
+        - 172.25.219.16/28         # .16–.31: external static IPs (shared)
+        - 172.25.219.32/27         # .32–.63: ROSA static pool
+        - 172.25.219.96/27         # .96–.127: unallocated
+        - 172.25.219.160/27        # .160–.191: ROSA auto-assign pool
         - 172.25.219.192/26        # .192–.255: headroom
-        # ROSA auto-assign pool: 172.25.219.160/27 (.160–.191)
+        # dl380 manages (left unreserved here so dl380's CUDN can allocate):
+        #   .64–.95  static, .128–.159 auto-assign
     transport: EVPN
     evpn:
       vtep: evpn-vtep
       macVRF:
         vni: 10319
         routeTarget: 65004:10319
-      # Join fabric Vrf_CORE (catalog T4) for routing to ESXi / VLAN 320
       ipVRF:
-        vni: 10000
-        routeTarget: 65004:10000
+        vni: 20319
+        routeTarget: 65004:20319

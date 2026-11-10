@@ -1,0 +1,175 @@
+# Ordered one-shot example for rosa-virt EVPN (matches ACM PolicyGenerator-EVPN-rosa).
+# Prefer ACM enforcement; use this only for labs / sharing with other teams.
+# See README.md for field-by-field rationale (ASN 65021, VTEP 10.10.0.0/17, labels).
+---
+# 1) Network operator
+apiVersion: operator.openshift.io/v1
+kind: Network
+metadata:
+  name: cluster
+spec:
+  additionalRoutingCapabilities:
+    providers:
+      - FRR
+  defaultNetwork:
+    ovnKubernetesConfig:
+      routeAdvertisements: Enabled
+      gatewayConfig:
+        routingViaHost: true
+        ipForwarding: Global
+---
+# 2) VTEP (ROSA machine/VPC CIDR — not dl380 10.101.103.0/24)
+apiVersion: k8s.ovn.org/v1
+kind: VTEP
+metadata:
+  name: evpn-vtep
+spec:
+  cidrs:
+    - 10.10.0.0/17
+  mode: Unmanaged
+---
+# 3a) CUDN blue-320
+apiVersion: k8s.ovn.org/v1
+kind: ClusterUserDefinedNetwork
+metadata:
+  name: blue-320
+  labels:
+    evpn: "true"
+    advertise: "evpn"
+spec:
+  namespaceSelector:
+    matchExpressions:
+      - key: primary-cudn
+        operator: In
+        values:
+          - blue-320
+  network:
+    topology: Layer2
+    layer2:
+      role: Primary
+      mtu: 1350
+      ipam:
+        lifecycle: Persistent
+      subnets:
+        - 172.25.220.0/24
+      defaultGatewayIPs:
+        - 172.25.220.1
+      infrastructureSubnets:
+        - 172.25.220.0/29
+      reservedSubnets:
+        - 172.25.220.8/29
+        - 172.25.220.16/28
+        - 172.25.220.32/27
+        - 172.25.220.64/27
+        - 172.25.220.96/27
+        - 172.25.220.160/27
+        - 172.25.220.192/26
+    transport: EVPN
+    evpn:
+      vtep: evpn-vtep
+      macVRF:
+        vni: 10320
+        routeTarget: 65004:10320
+      ipVRF:
+        vni: 20320
+        routeTarget: 65004:20320
+---
+# 3b) CUDN green-319
+apiVersion: k8s.ovn.org/v1
+kind: ClusterUserDefinedNetwork
+metadata:
+  name: green-319
+  labels:
+    evpn: "true"
+    advertise: "evpn"
+spec:
+  namespaceSelector:
+    matchExpressions:
+      - key: primary-cudn
+        operator: In
+        values:
+          - green-319
+  network:
+    topology: Layer2
+    layer2:
+      role: Primary
+      mtu: 1350
+      ipam:
+        lifecycle: Persistent
+      subnets:
+        - 172.25.219.0/24
+      defaultGatewayIPs:
+        - 172.25.219.1
+      infrastructureSubnets:
+        - 172.25.219.0/29
+      reservedSubnets:
+        - 172.25.219.8/29
+        - 172.25.219.16/28
+        - 172.25.219.32/27
+        - 172.25.219.96/27
+        - 172.25.219.160/27
+        - 172.25.219.192/26
+    transport: EVPN
+    evpn:
+      vtep: evpn-vtep
+      macVRF:
+        vni: 10319
+        routeTarget: 65004:10319
+      ipVRF:
+        vni: 20319
+        routeTarget: 65004:20319
+---
+# 4) FRR peering (ASN 65021 → TOR .3/.4)
+apiVersion: frrk8s.metallb.io/v1beta1
+kind: FRRConfiguration
+metadata:
+  name: underlay-rr-peer
+  namespace: openshift-frr-k8s
+  labels:
+    evpn: "true"
+spec:
+  nodeSelector: {}
+  bgp:
+    routers:
+      - asn: 65021
+        neighbors:
+          - address: 10.101.103.3
+            asn: 65004
+            ebgpMultiHop: true
+          - address: 10.101.103.4
+            asn: 65004
+            ebgpMultiHop: true
+---
+# 5) RouteAdvertisements
+apiVersion: k8s.ovn.org/v1
+kind: RouteAdvertisements
+metadata:
+  name: advertise-evpn-rosa
+spec:
+  targetVRF: auto
+  advertisements:
+    - PodNetwork
+  nodeSelector: {}
+  frrConfigurationSelector:
+    matchLabels:
+      evpn: "true"
+  networkSelectors:
+    - networkSelectionType: ClusterUserDefinedNetworks
+      clusterUserDefinedNetworkSelector:
+        networkSelector:
+          matchLabels:
+            advertise: "evpn"
+---
+# 6) KubeVirt l2bridge binding
+apiVersion: kubevirt.io/v1
+kind: KubeVirt
+metadata:
+  name: kubevirt-kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  configuration:
+    network:
+      binding:
+        l2bridge:
+          domainAttachmentType: managedTap
+          migration: {}

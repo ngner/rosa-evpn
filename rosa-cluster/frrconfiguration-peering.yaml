@@ -1,0 +1,33 @@
+# Underlay EVPN peering: rosa-virt (ASN 65021) → TOR route reflectors (ASN 65004).
+# Neighbors are TOR Loopback0 addresses; switches already have ROSA_EVPN peer-group
+# for 65021 — no switch change required when re-adding this config.
+#
+# ebgpMultiHop: TOR peers are loopbacks (not on-link).
+#
+# Do NOT set sourceaddress: lo on ROSA (unlike dl380). ROSA VTEPs are machine/VPC
+# IPs (10.10.0.0/17). sourceaddress: lo makes BGP source from OVN's host loopback
+# (e.g. 172.20.0.1), which the fabric does not route — sessions stay Connect/SYN-SENT.
+# Leave source unset so TCP uses br-ex (node VPC IP).
+#
+# Label evpn: "true" is selected by RouteAdvertisements (routeadvertisement-evpn.yaml).
+#
+# ACM: source-crs/evpn/frrconfiguration-peering-rosa.yaml
+apiVersion: frrk8s.metallb.io/v1beta1
+kind: FRRConfiguration
+metadata:
+  name: underlay-rr-peer
+  namespace: openshift-frr-k8s
+  labels:
+    evpn: "true"
+spec:
+  nodeSelector: {}
+  bgp:
+    routers:
+      - asn: 65021
+        neighbors:
+          - address: 10.101.103.3
+            asn: 65004
+            ebgpMultiHop: true
+          - address: 10.101.103.4
+            asn: 65004
+            ebgpMultiHop: true

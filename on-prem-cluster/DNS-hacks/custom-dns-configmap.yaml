@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dns-config
+  namespace: custom-dns
+data:
+  Corefile: |
+    vpce-svc-0a21ebe0cc5ec0e00.ap-southeast-1.vpce.amazonaws.com {
+        log stdout
+        errors
+        file /etc/coredns/vpce-svc-0a21ebe0cc5ec0e00.ap-southeast-1.vpce.amazonaws.com
+    }
+    p3.openshiftapps.com {
+        log stdout
+        errors
+        hosts {
+            10.10.102.89 api.bgp.afxr.p3.openshiftapps.com
+            10.10.58.142 console-openshift-console.apps.rosa.bgp.afxr.p3.openshiftapps.com
+            10.10.58.142 oauth-openshift.apps.rosa.bgp.afxr.p3.openshiftapps.com
+            10.10.102.89 oauth.bgp.afxr.p3.openshiftapps.com
+            fallthrough
+        }
+        forward . /etc/resolv.conf
+    }
+  vpce-svc-0a21ebe0cc5ec0e00.ap-southeast-1.vpce.amazonaws.com: |
+    $TTL    1800
+    $ORIGIN vpce-svc-0a21ebe0cc5ec0e00.ap-southeast-1.vpce.amazonaws.com.
+
+    @ 3600 IN SOA dns.local. hostmaster.dns.local. 2026110901 300 1800 14400 300
+    vpce-0f4a3b77e41f08dbe-gbwx48y2 IN A 10.10.102.89

@@ -4,8 +4,8 @@ Lab knowledge pack: annotated **rendered** objects and notes from connecting
 an on-prem OpenShift Virtualization cluster to ROSA over EVPN, and migrating
 VMs between them.
 
-We used **ACM** in the lab to install Submariner and to render/apply the
-networking objects. This repo keeps those resulting YAMLs (not PolicyGenerator
+We used **ACM** in the lab to install and to render/apply the
+networking objects and supporting infra. This repo keeps the resulting YAMLs (not PolicyGenerator
 or policy wrappers) so the applied shape is easy to read.
 
 Start here for the story; use site folders for YAML.

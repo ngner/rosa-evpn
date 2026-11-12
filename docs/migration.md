@@ -34,6 +34,10 @@ source API (`6443`) and export (`443`). Treat underlay + any mesh MTU as
 part of the same reachability design. Detail and failure traces: root
 `NOTES.md`.
 
+![Live migration network challenge: hub, dl380, and rosa-virt with Submariner bridging pod networks while CUDN guest path cannot carry migration sync](images/live-migration-network-challenge.png)
+
+*Figure: Live migration needs a routable path to the destination listener (pod overlay). Submariner provides that workaround; guest EVPN/CUDN L2 does not replace it.*
+
 ## Why cold migration fails for VMs already on a CUDN
 
 Cold migration’s importer/export path assumes the VM’s namespace uses the
@@ -58,6 +62,10 @@ Guest L2 for live migration in this lab uses KubeVirt `l2bridge` with
 `migration: {}` on the Primary EVPN CUDN (shared macVRF across sites when
 fabric Phase 2 is up). That is **guest** traffic. It does **not** replace
 the Submariner (or successor) path for the migration protocol itself.
+
+![Same-IP live migrate topology across on-prem, EVPN fabric, and ROSA](images/same-ip-live-migrate-topology.png)
+
+*Figure: Same-IP live migrate — guest stays on the fabric-aligned L2/CUDN while migration control/data still needs the Submariner (or successor) path.*
 
 ## Hub role (rendered)
 

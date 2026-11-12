@@ -28,6 +28,8 @@
 | **Data plane** | VXLAN using cluster VTEP CIDRs routable to the fabric / peer site |
 | **Fabric relationship** | CUDN RTs aligned with fabric (e.g. 319/320 families) |
 
+Same-IP live migrate on those VLANs/CUDNs: [topology diagram](images/same-ip-live-migrate-topology.png) and [migration notes](migration.md#live-migration-and-evpn).
+
 ### Still not “full leaf”
 
 Fabric peering is necessary to *aim at* real VLAN/VNI membership, but today

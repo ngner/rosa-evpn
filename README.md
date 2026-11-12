@@ -36,6 +36,10 @@ Hub: MTV forklift drives plans via both APIs
 
 Historical RR diagram and apply notes: `route-reflector-example/` + [docs/evolution.md](docs/evolution.md).
 
+![Same-IP live migrate topology across on-prem, EVPN fabric, and ROSA](docs/images/same-ip-live-migrate-topology.png)
+
+*Same-IP live migrate on fabric-aligned CUDNs (e.g. green-319); Submariner/workaround detail: [docs/migration.md](docs/migration.md).*
+
 ## Workarounds (temporary)
 
 | Workaround | Why we needed it | Hoped successor |

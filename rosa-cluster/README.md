@@ -16,6 +16,8 @@ lab: [`route-reflector-example/`](../route-reflector-example/README.md).
 | CUDNs | yellow + green-319 + blue-320 | green-319 + blue-320 only |
 | Peers | TOR Lo0 `10.101.103.3` / `.4` | same (no switch changes) |
 
+The dl380 column is the intended live fabric state. The objects checked in under [on-prem/README.md](../on-prem/README.md) are the route-reflector-era snapshot (VTEP `192.168.188.0/24`, `sourceaddress` unset, RR at `192.168.188.152`).
+
 Setting `sourceaddress: lo` on ROSA makes BGP SYN from OVN's host loopback
 (e.g. `172.20.0.1`), which the fabric does not route — sessions stay `Connect`.
 Leave `sourceaddress` unset so TCP uses the node VPC address on br-ex.

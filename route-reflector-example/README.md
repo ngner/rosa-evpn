@@ -45,11 +45,11 @@ Deploy first — the script exits if that veth does not exist yet.
 
 ## Verify
 
-Container name follows Containerlab’s `clab-<lab>-<node>` pattern (`evpn-rr` / `rr`):
+Container name follows Containerlab’s `clab-<lab>-<node>` pattern (`evpn-rr` / `rr`). This lab’s Containerlab runtime was podman:
 
 ```bash
-sudo docker exec clab-evpn-rr-rr vtysh -c "show bgp l2vpn evpn summary"
-sudo docker exec clab-evpn-rr-rr vtysh -c "show bgp l2vpn evpn"
+sudo podman exec clab-evpn-rr-rr vtysh -c "show bgp l2vpn evpn summary"
+sudo podman exec clab-evpn-rr-rr vtysh -c "show bgp l2vpn evpn"
 ```
 
 Expect the on-prem and ROSA sessions as route-reflector clients once each

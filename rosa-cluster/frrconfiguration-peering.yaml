@@ -11,7 +11,7 @@
 #
 # Label evpn: "true" is selected by RouteAdvertisements (routeadvertisement-evpn.yaml).
 #
-# ACM: source-crs/evpn/frrconfiguration-peering-rosa.yaml
+# Lab provenance: ACM rendered this FRRConfiguration for rosa-virt.
 apiVersion: frrk8s.metallb.io/v1beta1
 kind: FRRConfiguration
 metadata:

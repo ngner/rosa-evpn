@@ -42,7 +42,7 @@ Patches (do not client-apply these as full objects):
 
 ```bash
 oc patch network.operator.openshift.io cluster --type=merge --patch-file 00-enable-frr-route-advertisements.yaml
-oc patch network.operator.openshift.io cluster --type=merge -f 01-local-gateway.yaml
+oc patch network.operator.openshift.io cluster --type=merge --patch-file 01-local-gateway.yaml
 oc patch kubevirt kubevirt-kubevirt-hyperconverged -n openshift-cnv \
   --type=merge --patch-file 02-kubevirt-default-l2bridge.yaml
 ```

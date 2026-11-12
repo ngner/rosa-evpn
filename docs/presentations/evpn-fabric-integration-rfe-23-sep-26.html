@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OVN-K EVPN CUDN as a leaf on a standard EVPN fabric — RFEs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;700&family=Red+Hat+Text:wght@400;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body { background: #151515; font-family: 'Red Hat Text', 'Helvetica Neue', Arial, sans-serif; color: #151515; }
+    h1, h2, h3, h4 { font-family: 'Red Hat Display', 'Helvetica Neue', Arial, sans-serif; font-weight: 700; }
+    code, pre { font-family: 'Red Hat Mono', monospace; }
+
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 4px; background: #ee0000;
+      z-index: 1000; transition: width 0.3s ease;
+    }
+
+    .presentation-container {
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .deck-container { position: relative; width: 1400px; max-width: 100%; }
+
+    .slide {
+      display: none; position: relative;
+      width: 1400px; max-width: 100%; min-height: 780px;
+      background: #ffffff; border-radius: 12px;
+      padding: 48px 56px 64px; overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    }
+    .slide.active { display: flex; flex-direction: column; }
+
+    .slide:not(.title-slide)::after {
+      content: '';
+      position: absolute; bottom: 16px; right: 24px;
+      width: 80px; height: 30px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 613 145'%3E%3Cpath fill='%23e00' d='M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78'/%3E%3Cpath fill='%23151515' d='M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z'/%3E%3C/svg%3E");
+      background-size: contain; background-repeat: no-repeat;
+      opacity: 0.35;
+    }
+
+    /* Title slide */
+    .title-slide {
+      background: linear-gradient(135deg, #ee0000 0%, #cc0000 100%);
+      color: #fff; justify-content: center; align-items: center; text-align: center;
+    }
+    .title-slide::after { display: none; }
+    .title-content { max-width: 900px; }
+    .main-title { font-size: 2.8rem; line-height: 1.15; color: #fff; margin-bottom: 0.4em; }
+    .subtitle { font-size: 1.2rem; color: rgba(255,255,255,0.85); }
+    .presenters { margin-top: 2.5rem; display: flex; gap: 2.5rem; justify-content: center; flex-wrap: wrap; }
+    .presenter-name { font-weight: 700; font-size: 1rem; color: #fff; }
+    .presenter-title { font-size: 0.85rem; color: rgba(255,255,255,0.7); }
+    .confidential { margin-top: 2rem; font-size: 0.75rem; color: rgba(255,255,255,0.6); letter-spacing: 0.05em; text-transform: uppercase; }
+
+    /* Slide header */
+    .slide-header { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+    .slide-header .rh-logo { width: 110px; height: auto; flex-shrink: 0; }
+    .slide-header h1 { font-size: 1.6rem; color: #151515; line-height: 1.2; }
+    .slide h2 { font-size: 1.1rem; color: #595959; margin-bottom: 16px; font-weight: 400; }
+
+    /* Phase badge */
+    .phase-badge {
+      display: inline-block; background: linear-gradient(135deg, #ee0000, #a60000);
+      color: #fff; font-weight: 700; font-size: 0.7rem; padding: 0.2em 0.8em;
+      border-radius: 20px; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 0.3em;
+    }
+    .phase-badge.p2 { background: linear-gradient(135deg, #4d94ff, #004d99); }
+    .phase-badge.p3 { background: linear-gradient(135deg, #f5921b, #9e4a06); }
+    .phase-badge.p4 { background: linear-gradient(135deg, #5e40be, #3d2785); }
+    .phase-badge.p5 { background: linear-gradient(135deg, #37a3a3, #147878); }
+    .phase-badge.decision { background: linear-gradient(135deg, #3d7317, #2a5010); }
+
+    /* Section divider slide */
+    .section-divider {
+      justify-content: center; align-items: center; text-align: center;
+      background: #f5f5f5;
+    }
+    .section-divider h1 { font-size: 2.2rem; color: #151515; margin: 0.3em 0 0.2em; }
+    .section-divider p { font-size: 1rem; color: #595959; max-width: 700px; }
+
+    /* Tables */
+    .leads-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 12px; }
+    .leads-table th {
+      background: #f5f5f5; color: #151515; font-weight: 700; text-align: left;
+      padding: 10px 14px; border-bottom: 2px solid #ee0000;
+    }
+    .leads-table td { padding: 9px 14px; border-bottom: 1px solid #e0e0e0; color: #151515; }
+    .leads-table tr:last-child td { border-bottom: none; }
+    .leads-table code { background: #f5f5f5; padding: 0.1em 0.35em; border-radius: 3px; font-size: 0.9em; color: #cc0000; }
+
+    /* Two-column */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 12px; }
+    .two-col > div {
+      background: #f5f5f5; border-radius: 10px; padding: 20px 24px;
+      border-left: 4px solid #e0e0e0;
+    }
+    .two-col > div.good { border-left-color: #3d7317; }
+    .two-col > div.bad { border-left-color: #f0561d; }
+    .two-col > div.warn { border-left-color: #f8ce1c; }
+    .two-col > div.accent { border-left-color: #0066cc; }
+    .two-col h4 { font-size: 0.95rem; margin-bottom: 6px; }
+
+    /* Rec grid */
+    .rec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 12px; }
+    .rec-grid.two { grid-template-columns: 1fr 1fr; }
+    .rec-card {
+      background: #f5f5f5; border-radius: 10px; padding: 20px 22px;
+      border-top: 4px solid #ee0000;
+    }
+    .rec-card h4 { font-size: 0.95rem; margin-bottom: 6px; }
+    .rec-card p { font-size: 0.85rem; color: #595959; }
+
+    /* Challenge list */
+    .challenge-list { list-style: none; margin-top: 12px; }
+    .challenge-list li {
+      background: #f5f5f5; border-left: 4px solid #f0561d; border-radius: 0 8px 8px 0;
+      padding: 10px 16px; margin-bottom: 8px; font-size: 0.85rem;
+    }
+    .challenge-list li code { background: #fff; padding: 0.1em 0.35em; border-radius: 3px; font-size: 0.9em; color: #cc0000; }
+    .challenge-list li strong { color: #151515; }
+
+    /* Tech grid */
+    .tech-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 16px; }
+    .tech-tile {
+      background: #f5f5f5; border-radius: 10px; padding: 24px; text-align: center;
+      border: 1px solid #e0e0e0;
+    }
+    .tech-tile .tile-name { font-weight: 700; font-size: 1.05rem; color: #ee0000; margin-bottom: 6px; }
+    .tech-tile .tile-desc { font-size: 0.85rem; color: #595959; }
+
+    /* Dark panel (for SVG diagrams) */
+    .dark-panel {
+      background: #151515; border-radius: 10px; padding: 24px;
+      margin-top: 12px; color: #e0e0e0;
+    }
+    .dark-panel svg { max-width: 100%; height: auto; }
+
+    /* Metric cards */
+    .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 16px; }
+    .metric-card {
+      background: #f5f5f5; border-radius: 10px; padding: 20px; text-align: center;
+      border-top: 4px solid #ee0000;
+    }
+    .metric-card .metric-value { font-family: 'Red Hat Display', sans-serif; font-size: 2rem; font-weight: 700; color: #ee0000; }
+    .metric-card .metric-label { font-size: 0.85rem; color: #595959; margin-top: 4px; }
+
+    /* Punchline / takeaway */
+    .punchline {
+      background: #f5f5f5; border-left: 4px solid #ee0000; padding: 14px 20px;
+      border-radius: 0 8px 8px 0; margin-top: 14px; font-size: 0.9rem; color: #151515;
+    }
+    .punchline code { background: #fff; padding: 0.1em 0.35em; border-radius: 3px; font-size: 0.9em; color: #cc0000; }
+    .takeaway {
+      background: rgba(238,0,0,0.06); border: 1px solid rgba(238,0,0,0.2); border-radius: 8px;
+      padding: 12px 16px; margin-top: 12px; font-size: 0.85rem; color: #151515;
+    }
+    .takeaway::before { content: '\2192  '; color: #ee0000; font-weight: 700; }
+
+    /* Decision cards */
+    .decision-box {
+      background: #f5f5f5; border: 2px solid #f8ce1c; border-radius: 8px;
+      padding: 16px 24px; text-align: center; margin: 16px auto; max-width: 600px;
+      font-weight: 700; font-size: 1.1rem;
+    }
+    .answer-row { display: flex; justify-content: center; gap: 24px; margin-top: 16px; flex-wrap: wrap; }
+    .answer-card {
+      background: #f5f5f5; border-radius: 10px; padding: 16px 20px; text-align: center; width: 260px;
+    }
+    .answer-card.green { border: 2px solid #3d7317; }
+    .answer-card.blue { border: 2px solid #0066cc; }
+    .answer-card.orange { border: 2px solid #f5921b; }
+    .answer-card h3 { font-size: 1.1rem; color: #151515; margin-bottom: 4px; }
+    .answer-card p { font-size: 0.8rem; color: #595959; }
+
+    /* VLAN chips */
+    .chip {
+      display: inline-block; padding: 0.15em 0.5em; border-radius: 4px;
+      font-size: 0.75rem; font-weight: 600; font-family: 'Red Hat Mono', monospace;
+    }
+    .chip.v100 { background: #4394e5; color: #fff; }
+    .chip.v200 { background: #f8ae54; color: #151515; }
+    .chip.v123 { background: #37a3a3; color: #fff; }
+    .chip.v150 { background: #5e40be; color: #fff; }
+    .chip.trunk { background: transparent; border: 2px solid #f8ce1c; color: #9e7a06; }
+
+    /* Constraint box */
+    .constraint-box {
+      background: #f5f5f5; border-left: 3px solid #f0561d; padding: 8px 14px;
+      border-radius: 0 6px 6px 0; margin-bottom: 6px; font-size: 0.8rem;
+    }
+    .constraint-box code { background: #fff; padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.9em; color: #cc0000; }
+
+    /* Inline pre */
+    .slide pre {
+      background: #151515; color: #e0e0e0; border-radius: 8px; padding: 12px 16px;
+      font-size: 0.8rem; overflow-x: auto; margin-top: 10px;
+    }
+    .slide pre code { color: #e0e0e0; background: none; }
+
+    /* Lab ref */
+    .lab-ref { position: absolute; bottom: 20px; right: 56px; font-size: 0.7rem; color: #595959; }
+
+    /* Slide content helpers */
+    .slide .content-body { font-size: 0.9rem; color: #151515; line-height: 1.6; flex: 1; }
+    .slide .content-body p { margin-bottom: 8px; }
+    .slide .content-body strong { color: #151515; }
+
+    /* Navigation */
+    .navigation {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 16px; z-index: 999;
+      background: rgba(21,21,21,0.9); padding: 8px 20px; border-radius: 40px;
+      backdrop-filter: blur(8px);
+    }
+    .nav-btn {
+      background: none; border: 2px solid rgba(255,255,255,0.3); color: #fff;
+      width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover { border-color: #ee0000; color: #ee0000; }
+    .slide-counter { color: rgba(255,255,255,0.7); font-family: 'Red Hat Mono', monospace; font-size: 0.85rem; }
+
+    /* Print */
+    @media print {
+      body { background: #fff; }
+      .progress-bar, .navigation { display: none !important; }
+      .presentation-container { padding: 0; min-height: auto; display: block; }
+      .deck-container { width: 100%; }
+      .slide {
+        display: flex !important; break-after: page; page-break-after: always;
+        box-shadow: none; border-radius: 0; min-height: 100vh;
+        width: 100%; max-width: 100%;
+        print-color-adjust: exact; -webkit-print-color-adjust: exact;
+      }
+      .title-slide {
+        background: linear-gradient(135deg, #ee0000 0%, #cc0000 100%) !important;
+        print-color-adjust: exact; -webkit-print-color-adjust: exact;
+      }
+      .dark-panel {
+        background: #fff !important; color: #151515 !important;
+        border-left: 4px solid #ee0000;
+        print-color-adjust: exact; -webkit-print-color-adjust: exact;
+      }
+      @page { margin: 0; size: A4 landscape; }
+    }
+  
+    .leads-table.compact { font-size: 0.72rem; }
+    .leads-table.compact th, .leads-table.compact td { padding: 6px 10px; }
+    .rec-grid.five { grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .rec-grid.five .rec-card { padding: 14px 12px; }
+    .rec-grid.five .rec-card h4 { font-size: 0.8rem; }
+    .rec-grid.five .rec-card p { font-size: 0.72rem; }
+    .prio { display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 0.1em 0.5em; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+    .prio.p1 { background: #ee0000; color: #fff; }
+    .prio.p2 { background: #0066cc; color: #fff; }
+    .prio.p3 { background: #595959; color: #fff; }
+    .agenda-list { list-style: none; margin-top: 20px; }
+    .agenda-list li { font-size: 1.15rem; padding: 12px 0; border-bottom: 1px solid #e0e0e0; color: #151515; }
+    .agenda-list li span { color: #ee0000; font-weight: 700; margin-right: 12px; font-family: 'Red Hat Mono', monospace; }
+    .status-ok { color: #3d7317; font-weight: 700; }
+    .status-fail { color: #f0561d; font-weight: 700; }
+    .status-partial { color: #9e7a06; font-weight: 700; }
+
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+  <div class="presentation-container">
+    <div class="deck-container">
+
+      <div class="slide active title-slide">
+        <div class="title-content">
+          <h1 class="main-title">OVN-K EVPN and standard fabric integration</h1>
+          <p class="subtitle">Attempt catalog, hurdles, and five RFEs — APAC tech lab / ROSA</p>
+        </div>
+        <div class="presenters">
+          <div class="presenter">
+            <div class="presenter-name">APAC technology lab</div>
+            <div class="presenter-title">23 September 2026</div>
+          </div>
+        </div>
+        <div class="confidential">Internal — EVPN / OVN-K product discussion</div>
+      </div>
+      <div class="slide">
+        <div class="slide-header">
+          <svg class="rh-logo" viewBox="0 0 613 145" xmlns="http://www.w3.org/2000/svg"><path fill="#e00" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/></svg>
+          <h1>Agenda</h1>
+        </div>
+        <h2>What we will cover</h2>
+        <ul class="agenda-list">
+          <li><span>01</span> Integration question — OCP as an extra EVPN leaf tier</li>
+          <li><span>02</span> What CUDN EVPN can and cannot do today</li>
+          <li><span>03</span> Product hurdles vs a standard many-VLAN / few-VRF fabric</li>
+          <li><span>04</span> Five RFEs (why fabric workarounds are not enough)</li>
+          <li><span>05</span> Ask of the EVPN team</li>
+        </ul>
+      </div>
+      <div class="slide">
+        <div class="slide-header">
+          <svg class="rh-logo" viewBox="0 0 613 145" xmlns="http://www.w3.org/2000/svg"><path fill="#e00" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/></svg>
+          <h1>The topic</h1>
+        </div>
+        <h2>Can CUDN EVPN integrate OpenShift as an extra leaf on a standard fabric?</h2>
+        <div class="decision-box" style="max-width:100%; margin-top:8px; font-size:1rem; text-align:left; line-height:1.45;">
+          Question: can Primary CUDN + ipVRF + FRR-k8s + RouteAdvertisements behave like a normal EVPN leaf — peering into an existing leaf–spine fabric with symmetric IRB?
+        </div>
+        <div class="two-col" style="margin-top:18px">
+          <div class="accent">
+            <h4>What “standard fabric” means</h4>
+            <p>Almost every leaf–spine EVPN design is <strong>~100s of VLANs into several VRFs</strong> (typically on the order of ~10), plus external VTEPs already on those VRFs. That scale is the bar — not a lab of two or three segments.</p>
+          </div>
+          <div class="warn">
+            <h4>Why that bar matters</h4>
+            <p>If CUDN only works for one VLAN per VRF, OpenShift is not a peer leaf on a real fabric. The product must target <strong>~100s of VLANs</strong> and <strong>several VRFs</strong>, or customers cannot integrate without redesigning the fabric around OVN.</p>
+          </div>
+        </div>
+        <div class="metric-grid" style="margin-top:16px">
+          <div class="metric-card"><div class="metric-value">~100s</div><div class="metric-label">VLANs — the normal fabric target</div></div>
+          <div class="metric-card"><div class="metric-value">~10</div><div class="metric-label">VRFs — several, not hundreds</div></div>
+          <div class="metric-card"><div class="metric-value">Leaf</div><div class="metric-label">OCP nodes = extra VTEP tier</div></div>
+          <div class="metric-card"><div class="metric-value">Gap</div><div class="metric-label">Multi-VLAN / few-VRF join fails today</div></div>
+        </div>
+      </div>
+      <div class="slide">
+        <div class="slide-header">
+          <svg class="rh-logo" viewBox="0 0 613 145" xmlns="http://www.w3.org/2000/svg"><path fill="#e00" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/></svg>
+          <h1>Topologies attempted</h1>
+        </div>
+        <h2>CUDN ↔ fabric leaf attempts (access-switch platform issues excluded)</h2>
+        <div class="punchline" style="margin-bottom:10px; margin-top:0">macVRF “L2 works” only inside the subnet: OVN owns <code>.1</code> and IPAM; fabric switch GW is unreachable; OVN GW has no external routes — Primary cannot shed IPAM.</div>
+        <table class="leads-table compact">
+          <thead><tr><th>ID</th><th>Topology</th><th>Model</th><th>Outcome</th></tr></thead>
+          <tbody>
+            <tr><td>T1</td><td>iBGP via Containerlab RR</td><td>Outbound-only FRR</td><td><span class="status-partial">Partial</span> — abandoned</td></tr>
+            <tr><td>T2</td><td>eBGP multihop to fabric leaves</td><td>Cluster ASN → fabric ASN</td><td><span class="status-ok">Worked</span> sessions + Type-2/5</td></tr>
+            <tr><td>T3</td><td>Stretched L2 macVRF</td><td>VNI 10319/10320</td><td><span class="status-partial">Same-subnet only</span> — cannot leave</td></tr>
+            <tr><td>T4</td><td>macVRF + ipVRF = 10000</td><td>Single CUDN → CORE</td><td><span class="status-ok">Worked</span> one CUDN only</td></tr>
+            <tr><td>T5</td><td>Unique ipVRF VNIs + shared RT</td><td>50319/50320 + 65004:10000</td><td><span class="status-fail">Failed</span> demux</td></tr>
+            <tr><td>T6</td><td>Dual CUDN ipVRF 10000</td><td>Share fabric L3VNI</td><td><span class="status-fail">Rejected</span> VNI overlap</td></tr>
+            <tr><td>T7–T8</td><td>macVRF-only / defaultGatewayIPs</td><td>OVN owns .1; no fabric GW</td><td><span class="status-fail">Useless L2</span> — trapped in subnet</td></tr>
+            <tr><td>T10</td><td>Fabric CRB + Type-5</td><td>Symmetric IRB leaves</td><td><span class="status-ok">Worked</span> with single CUDN (T4)</td></tr>
+            <tr><td>T12</td><td>Asymmetric IRB</td><td>—</td><td>Not attempted</td></tr>
+            <tr><td>T13</td><td>VTEP underlay reachability</td><td>Bidirectional to node VTEPs</td><td><span class="status-ok">Required</span> for VXLAN</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="slide">
+        <div class="slide-header">
+          <svg class="rh-logo" viewBox="0 0 613 145" xmlns="http://www.w3.org/2000/svg"><path fill="#e00" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/></svg>
+          <h1>What worked</h1>
+        </div>
+        <h2>The only off-subnet path today — and what it forces on the fabric</h2>
+        <div class="two-col">
+          <div class="warn">
+            <h4>Same-subnet L2 — not a win</h4>
+            <p>Type-2 on-subnet works. Pods still cannot leave: OVN owns <code>.1</code>, fabric GW unreachable, OVN GW has no external routes, Primary IPAM cannot be removed.</p>
+          </div>
+          <div class="good">
+            <h4>What actually worked (narrow)</h4>
+            <p><strong>One VLAN ↔ one CUDN ↔ one ipVRF</strong> with L3VNI/RT matching a fabric VRF (e.g. VNI <code>10000</code>). That single CUDN gets Type-5 off-subnet into that VRF.</p>
+          </div>
+        </div>
+        <div class="punchline" style="margin-top:14px">
+          <strong>How you would have to scale that without shared L3VNI membership:</strong>
+          each extra VLAN needs its own CUDN ipVRF (unique L3VNI) → a matching VRF on the fabric leaves → then <strong>VRF route-leak</strong> into a shared core VRF. For ~100s of VLANs that is ~100s of fabric VRFs + leak policy.
+        </div>
+        <div class="takeaway">Preferred standard model: <strong>symmetric IRB + shared L3VNI</strong> — many CUDNs join one fabric VRF; inter-CUDN traffic goes via L3VNI to fabric gateways (RFE-2), not per-VLAN leak. Lab only proved the one-CUDN / one-VRF case.</div>
+      </div>
+      <div class="slide">
+        <div class="slide-header">
+          <svg class="rh-logo" viewBox="0 0 613 145" xmlns="http://www.w3.org/2000/svg"><path fill="#e00" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/></svg>
+          <h1>Hurdles — control plane and underlay</h1>
+        </div>
+        <h2>H1–H6, H14–H16</h2>
+        <ul class="challenge-list">
+          <li><strong>H1</strong> FRR-k8s cannot accept inbound BGP on :179 (listens 50179)</li>
+          <li><strong>H2</strong> Dynamic node IPs — static peer lists painful</li>
+          <li><strong>H3 / H6</strong> VTEP must be fabric-routable; VXLAN path ≠ BGP path → ARP OK, blackhole</li>
+          <li><strong>H5</strong> RouteAdvertisements label mismatch → no Type-5</li>
+          <li><strong>H14</strong> Underlay vs cluster API path conflicts (ops)</li>
+          <li><strong>H16</strong> FRRConfiguration <code>nodeSelector: &#123;&#125;</code> matches everything</li>
+          <li><strong>H4 / H15</strong> Manual <code>reservedSubnets</code>; invalid CIDRs / immutable recreate</li>
+        </ul>
+      </div>
+      <div class="slide">
+        <div class="slide-header">
+          <svg class="rh-logo" viewBox="0 0 613 145" xmlns="http://www.w3.org/2000/svg"><path fill="#e00" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/></svg>
+          <h1>Hurdles — OVN CUDN and Type-5</h1>
+        </div>
+        <h2>H7–H10, H12–H13 — product limits for fabric scale</h2>
+        <ul class="challenge-list">
+          <li><strong>H7</strong> OVN ipVRF VNI uniqueness — cannot share L3VNI 10000 across CUDNs</li>
+          <li><strong>H8</strong> Shared RT ≠ shared L3 VNI — RIB imports; VXLAN demux fails</li>
+          <li><strong>H9</strong> 1:1 macVRF ↔ ipVRF — cannot attach green to blue’s router</li>
+          <li><strong>H10</strong> OVN owns Primary GW <code>.1</code> — blocks fabric anycast / <code>defaultGatewayIPs</code></li>
+          <li><strong>H12</strong> One fabric VRF ↔ one L3VNI — multi-RT import ≠ multi-VNI demux</li>
+          <li><strong>H13</strong> Disabling CORE L3VNI does not fix multi-CUDN; breaks symmetric IRB</li>
+        </ul>
+      </div>
+      <div class="slide">
+        <div class="slide-header">
+          <svg class="rh-logo" viewBox="0 0 613 145" xmlns="http://www.w3.org/2000/svg"><path fill="#e00" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/></svg>
+          <h1>CUDN vs standard fabric leaf</h1>
+        </div>
+        <h2>What works today vs what a standard leaf–spine expects</h2>
+        <table class="leads-table compact">
+          <thead><tr><th>Expectation</th><th>CUDN EVPN today</th></tr></thead>
+          <tbody>
+            <tr><td>Peer EVPN to fabric leaves (Type-2/5)</td><td><span class="status-ok">Works</span></td></tr>
+            <tr><td>Same-subnet L2 stretch (Type-2)</td><td><span class="status-partial">Technically works — useless alone</span></td></tr>
+            <tr><td>Leave the subnet via fabric leaf GW</td><td><span class="status-fail">No</span> — OVN owns <code>.1</code>; switch GW unreachable</td></tr>
+            <tr><td>OVN GW with external / fabric routes (macVRF-only)</td><td><span class="status-fail">No</span> — no routes off-subnet</td></tr>
+            <tr><td>Disable Primary IPAM / bridge-only leaf</td><td><span class="status-fail">No</span> — IPAM required on Primary</td></tr>
+            <tr><td>One network joins one fabric VRF (ipVRF match)</td><td><span class="status-ok">Works</span> (single CUDN only)</td></tr>
+            <tr><td>Many VLANs in one fabric VRF (shared L3VNI / symmetric IRB)</td><td><span class="status-fail">No</span> — H7–H9, H12; inter-CUDN cannot use fabric gateways</td></tr>
+            <tr><td>Inter-CUDN via fabric gateways (not OVN-local L3)</td><td><span class="status-fail">No</span> — needs shared L3VNI (RFE-2) and/or fabric GW (RFE-3)</td></tr>
+          </tbody>
+        </table>
+        <div class="punchline">“L2 works” means ARP/ping on-subnet only. Without fabric GW handoff (RFE-3) or ipVRF membership (RFE-1/2), the CUDN is a dead-end segment.</div>
+      </div>
+      <div class="slide">
+        <div class="slide-header">
+          <svg class="rh-logo" viewBox="0 0 613 145" xmlns="http://www.w3.org/2000/svg"><path fill="#e00" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/></svg>
+          <h1>What still does not work</h1>
+        </div>
+        <h2>Gaps vs standard leaf–spine expectations</h2>
+        <table class="leads-table compact">
+          <thead><tr><th>Gap</th><th>Hurdles</th><th>RFE</th></tr></thead>
+          <tbody>
+            <tr><td>Blue ↔ green intervlan from CUDNs</td><td>H7–H10, H12</td><td>1, 2, 3</td></tr>
+            <tr><td>Two CUDNs equal members of one fabric L3VRF</td><td>H7, H8, H12</td><td>1, 2</td></tr>
+            <tr><td>Fabric anycast as Primary default GW</td><td>H10</td><td>3</td></tr>
+            <tr><td>macVRF + defaultGatewayIPs as L3</td><td>H10</td><td>3</td></tr>
+            <tr><td>~100s VLANs into ~10 VRFs</td><td>H7–H10, H4</td><td>1, 2, 5</td></tr>
+            <tr><td>Inbound BGP / stable multi-cluster peering</td><td>H1, H2</td><td>4</td></tr>
+            <tr><td>First-class multi-cluster IPAM</td><td>H4, H15</td><td>5</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="slide">
+        <div class="slide-header">
+          <svg class="rh-logo" viewBox="0 0 613 145" xmlns="http://www.w3.org/2000/svg"><path fill="#e00" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/></svg>
+          <h1>Scale mismatch</h1>
+        </div>
+        <h2>Extra leaf tier vs standard many-VLAN / few-VRF leaf</h2>
+        <div class="two-col">
+          <div class="warn">
+            <h4>CUDN leaf today</h4>
+            <p>Same-subnet L2 stretches but is a dead end (OVN GW, no external routes, IPAM mandatory). One CUDN can join one fabric VRF with ipVRF. Cannot map many CUDNs into few VRFs or use fabric anycast GW.</p>
+          </div>
+          <div class="accent">
+            <h4>Standard fabric leaf</h4>
+            <p>~100s of VLANs into ~10 VRFs. Symmetric IRB anycast. External VTEPs and OpenShift share the same VRFs.</p>
+          </div>
+        </div>
+        <div class="decision-box">OpenShift must peer as a normal EVPN leaf into existing VRFs — not invent a one-CUDN-per-VRF tax on the fabric.</div>
+      </div>
+      <div class="slide">
+        <div class="slide-header">
+          <svg class="rh-logo" viewBox="0 0 613 145" xmlns="http://www.w3.org/2000/svg"><path fill="#e00" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/></svg>
+          <h1>Five RFEs</h1>
+        </div>
+        <h2>Separate asks — RFE-1 and RFE-2 related but not merged</h2>
+        <div class="rec-grid five">
+          <div class="rec-card"><h4>RFE-1 <span class="prio p1">P1</span></h4><p>Multi-L2 → one shared IP-VRF</p></div>
+          <div class="rec-card"><h4>RFE-2 <span class="prio p1">P1</span></h4><p>Shared L3VNI / symmetric IRB — inter-CUDN via fabric</p></div>
+          <div class="rec-card"><h4>RFE-3 <span class="prio p1">P1</span></h4><p>Primary fabric anycast / bridge-only GW</p></div>
+          <div class="rec-card"><h4>RFE-4 <span class="prio p3">P3</span></h4><p>FRR-k8s inbound BGP :179</p></div>
+          <div class="rec-card"><h4>RFE-5 <span class="prio p2">P2</span></h4><p>Multi-cluster IPAM</p></div>
+        </div>
+        <div class="takeaway">Specs: docs/superpowers/specs/2026-09-23-rfe-0{1–5}-*.md</div>
+      </div>
+      <div class="slide">
+        <div class="slide-header">
+          <svg class="rh-logo" viewBox="0 0 613 145" xmlns="http://www.w3.org/2000/svg"><path fill="#e00" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/></svg>
+          <h1>RFE-1 — Multi-L2 shared IP-VRF</h1>
+        </div>
+        <h2>Break 1:1 macVRF ↔ ipVRF <span class="prio p1">P1</span></h2>
+        <div class="content-body">
+          <p><strong>Ask:</strong> Many Primary Layer2 EVPN CUDNs attach to one shared IP-VRF so intervlan works inside the cluster VRF.</p>
+          <p><strong>Why not fabric-only:</strong> One CUDN → one switch VRF + leak into CORE needs ~100s of VRFs (target is ~10). Multi-RT import ≠ demux (H8/H12); leak-NH limits (H11). Fabric SVIs also unreachable (RFE-3 / H10).</p>
+          <p><strong>Hurdles:</strong> H7, H9, H12 — plus H10/H11 via blocked externalization</p>
+          <p><strong>Accept:</strong> ≥2 Primary L2 CUDNs on different subnets share one IP-VRF with working pod intervlan; documented path toward ≥50 L2 → ≤5 IP-VRFs.</p>
+        </div>
+        <div class="punchline">Without shared IP-VRF in OVN, and without ~100 fabric VRFs or fabric SVI handoff, CUDNs can never route to each other.</div>
+      </div>
+      <div class="slide">
+        <div class="slide-header">
+          <svg class="rh-logo" viewBox="0 0 613 145" xmlns="http://www.w3.org/2000/svg"><path fill="#e00" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/></svg>
+          <h1>RFE-2 — Fabric L3VNI membership</h1>
+        </div>
+        <h2>Symmetric IRB + shared L3VNI — inter-CUDN on the fabric <span class="prio p1">P1</span></h2>
+        <div class="content-body">
+          <p><strong>Desired model:</strong> Many CUDN VLANs membership-map into one fabric VRF / <strong>one shared L3VNI</strong>. Off-subnet and <strong>inter-CUDN</strong> traffic go via that L3VNI to <strong>fabric gateways</strong> (CRB). Inter-VRF policy stays on the fabric’s several VRFs — not OVN-local routing between CUDNs, and not ~100s of VRFs + leak.</p>
+          <p><strong>Ask:</strong> Map cluster IP-VRF to fabric L3VNI + RT so Type-5 and symmetric IRB return demux work for multiple CUDNs.</p>
+          <p><strong>Why not fabric-only today:</strong> Dual VNI 10000 rejected (H7). Unique OVN VNIs + shared RT → return on fabric L3VNI blackholes (H8). Leak workaround abandons standard symmetric IRB scale.</p>
+          <p><strong>Accept:</strong> ≥2 CUDNs in one fabric VRF; inter-CUDN via fabric gateways; round-trip on shared L3VNI.</p>
+        </div>
+        <div class="punchline">Symmetric IRB shared L3VNI is how standard fabrics route between VLANs — CUDN must join that model, not invent per-VLAN VRF leaking.</div>
+      </div>
+      <div class="slide">
+        <div class="slide-header">
+          <svg class="rh-logo" viewBox="0 0 613 145" xmlns="http://www.w3.org/2000/svg"><path fill="#e00" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/></svg>
+          <h1>RFE-3 — Primary fabric gateway</h1>
+        </div>
+        <h2>Fabric anycast or bridge-only Primary mode <span class="prio p1">P1</span></h2>
+        <div class="content-body">
+          <p><strong>Ask:</strong> Primary EVPN CUDNs use fabric anycast IRB as GW, or explicit bridge-only L2 — OVN must not silently own <code>.1</code>. Complementary to RFE-2: both put <strong>inter-CUDN L3 on the fabric</strong> (L2 hairpin to anycast vs L3VNI membership).</p>
+          <p><strong>Why not fabric-only:</strong> CRB SVIs already exist in <code>Vrf_CORE</code> and work for external hosts. Pods ARP OVN <code>0a:58:…</code>, never the fabric leaf. More fabric VRFs / leaks do not help if packets never leave the node — and still fail the ~10-VRF scale goal (RFE-1).</p>
+          <p><strong>Hurdles:</strong> H10 — <code>defaultGatewayIPs</code> failed</p>
+          <p><strong>Accept:</strong> Pod ARPs fabric GW MAC; off-subnet via CRB works in chosen mode; field semantics match dataplane.</p>
+        </div>
+        <div class="punchline">Cannot use fabric SVIs + cannot stand up ~100 VRFs with leak ⇒ CUDNs never route to each other via CRB.</div>
+      </div>
+      <div class="slide">
+        <div class="slide-header">
+          <svg class="rh-logo" viewBox="0 0 613 145" xmlns="http://www.w3.org/2000/svg"><path fill="#e00" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/></svg>
+          <h1>RFE-4 — FRR inbound BGP</h1>
+        </div>
+        <h2>Accept peers on TCP 179 (or first-class RR) <span class="prio p3">P3</span></h2>
+        <div class="content-body">
+          <p><strong>Ask:</strong> FRR-k8s accepts inbound BGP on :179, or a supported RR / Service DNAT story — plus selective FRRConfiguration binding.</p>
+          <p><strong>Hurdles:</strong> H1, H2, H16 — listen 50179; ROSA dynamic IPs; <code>&#123;&#125;</code> selector matches all.</p>
+          <p><strong>Accept:</strong> Fabric leaf/RR can initiate to cluster on 179; documented dynamic-IP pattern without per-node peer churn.</p>
+        </div>
+      </div>
+      <div class="slide">
+        <div class="slide-header">
+          <svg class="rh-logo" viewBox="0 0 613 145" xmlns="http://www.w3.org/2000/svg"><path fill="#e00" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/></svg>
+          <h1>RFE-5 — Multi-cluster IPAM</h1>
+        </div>
+        <h2>Shared EVPN segments without manual reserves <span class="prio p2">P2</span></h2>
+        <div class="content-body">
+          <p><strong>Ask:</strong> First-class multi-cluster IPAM for shared L2 EVPN segments beyond hand-maintained complementary <code>reservedSubnets</code>.</p>
+          <p><strong>Hurdles:</strong> H4, H15</p>
+          <p><strong>Accept:</strong> Two (then three) clusters share a <code>/24</code> without editing peer reserves on every change; clear errors for bad CIDRs.</p>
+        </div>
+      </div>
+      <div class="slide title-slide">
+        <div class="title-content">
+          <h1 class="main-title">Ask of the EVPN team</h1>
+          <p class="subtitle">Enable CUDN as a standard EVPN leaf — triage RFE-1…5 · Catalog in rosa-evpn</p>
+        </div>
+        <div class="presenters">
+          <div class="presenter">
+            <div class="presenter-name">docs/superpowers/specs/2026-09-23-evpn-attempt-catalog.md</div>
+            <div class="presenter-title">Five RFE markdowns + this deck</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="navigation">
+    <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">&lsaquo;</button>
+    <span class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides"></span></span>
+    <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">&rsaquo;</button>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    let current = 0;
+    document.getElementById('totalSlides').textContent = slides.length;
+
+    function showSlide(n) {
+      slides[current].classList.remove('active');
+      current = Math.max(0, Math.min(n, slides.length - 1));
+      slides[current].classList.add('active');
+      document.getElementById('currentSlide').textContent = current + 1;
+      document.getElementById('progressBar').style.width =
+        ((current + 1) / slides.length * 100) + '%';
+    }
+    function changeSlide(d) { showSlide(current + d); }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); changeSlide(1); }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); changeSlide(-1); }
+      if (e.key === 'Home') { e.preventDefault(); showSlide(0); }
+      if (e.key === 'End') { e.preventDefault(); showSlide(slides.length - 1); }
+    });
+  </script>
+
+</body>
+</html>

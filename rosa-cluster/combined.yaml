@@ -1,5 +1,5 @@
-# Ordered one-shot example for rosa-virt EVPN (matches ACM PolicyGenerator-EVPN-rosa).
-# Prefer ACM enforcement; use this only for labs / sharing with other teams.
+# Ordered one-shot example for rosa-virt EVPN.
+# Lab provenance: ACM rendered and applied this shape on rosa-virt; this file is that result.
 # See README.md for field-by-field rationale (ASN 65021, VTEP 10.10.0.0/17, labels).
 ---
 # 1) Network operator

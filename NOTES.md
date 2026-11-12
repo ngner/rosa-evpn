@@ -7,7 +7,7 @@ Narrative docs (read these first):
 - [Migration / Submariner / cold CUDN](docs/migration.md)
 - [rosa-virt components](docs/rosa-virt-components.md)
 
-The sections below are raw lab notes and failure traces.
+The sections below are raw lab notes and failure traces from both the route-reflector era and the later fabric path. The narrative docs above say which path is current.
 
 ## ROSA Dynamic Node IPs is a pain for BGP peers
 

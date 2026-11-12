@@ -1,0 +1,25 @@
+# Advertise PodNetwork for every ClusterUserDefinedNetwork labeled advertise=evpn
+# into the FRRConfiguration labeled evpn=true (underlay-rr-peer above).
+#
+# targetVRF: auto → OVN creates/uses the per-CUDN VRF (matches fabric ipVRF RTs).
+# Object name advertise-evpn-rosa is distinct from dl380's advertise-evpn.
+#
+# ACM: source-crs/evpn/routeadvertisement-evpn-rosa.yaml
+apiVersion: k8s.ovn.org/v1
+kind: RouteAdvertisements
+metadata:
+  name: advertise-evpn-rosa
+spec:
+  targetVRF: auto
+  advertisements:
+    - PodNetwork
+  nodeSelector: {}
+  frrConfigurationSelector:
+    matchLabels:
+      evpn: "true"
+  networkSelectors:
+    - networkSelectionType: ClusterUserDefinedNetworks
+      clusterUserDefinedNetworkSelector:
+        networkSelector:
+          matchLabels:
+            advertise: "evpn"

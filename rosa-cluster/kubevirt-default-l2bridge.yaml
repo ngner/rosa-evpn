@@ -1,0 +1,17 @@
+# Enable the KubeVirt "l2bridge" network binding (managedTap) for VMs on primary
+# CUDNs. Prefer this KubeVirt CR shape (matches ACM) over legacy HyperConverged
+# networkBinding patches.
+#
+# ACM: source-crs/evpn/kubevirt-default-l2bridge.yaml
+apiVersion: kubevirt.io/v1
+kind: KubeVirt
+metadata:
+  name: kubevirt-kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec:
+  configuration:
+    network:
+      binding:
+        l2bridge:
+          domainAttachmentType: managedTap
+          migration: {}

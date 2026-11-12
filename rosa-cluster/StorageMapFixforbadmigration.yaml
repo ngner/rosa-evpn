@@ -1,0 +1,20 @@
+apiVersion: forklift.konveyor.io/v1beta1
+kind: StorageMap
+metadata:
+  name: storage-map-dl380-to-rosa-efs
+  namespace: mtv-integrations
+spec:
+  map:
+  - destination:
+      accessMode: ReadWriteMany
+      storageClass: efs-sc
+      volumeMode: Filesystem
+    source:
+      name: px-rwx-block-kubevirt
+  provider:
+    destination:
+      name: rosa-virt-mtv
+      namespace: mtv-integrations
+    source:
+      name: dl380-mtv
+      namespace: mtv-integrations

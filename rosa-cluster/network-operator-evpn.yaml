@@ -1,0 +1,21 @@
+# Prerequisite for EVPN: enable FRR-k8s, RouteAdvertisements, and host gateway
+# (routingViaHost + Global IP forwarding). On rosa-virt this is often already set;
+# ACM policy rosa-evpn-network-operator enforces the same shape.
+#
+# Equivalent to: oc apply -f network-operator-evpn.yaml
+# (merge-patches only the fields below; other Network.spec fields are left alone
+# when applied via ACM policy / server-side apply depending on controller).
+apiVersion: operator.openshift.io/v1
+kind: Network
+metadata:
+  name: cluster
+spec:
+  additionalRoutingCapabilities:
+    providers:
+      - FRR
+  defaultNetwork:
+    ovnKubernetesConfig:
+      routeAdvertisements: Enabled
+      gatewayConfig:
+        routingViaHost: true
+        ipForwarding: Global

@@ -14,8 +14,8 @@ Start here for the story; use site folders for YAML.
 
 1. **Route reflector era** — outbound-only BGP to a Containerlab FRR RR so
    both sites could exchange EVPN without inbound :179 on FRR-k8s.
-2. **Fabric era (current)** — peer lab TOR RRs and align CUDN VNIs/RTs with
-   fabric segments (green-319 / blue-320) so clusters participate in those L2s.
+2. **Fabric era (current)** — peer with lab Asterfusion EVPN fabric swithces and align CUDN VNIs/RTs with
+   fabric segments (green-319 / blue-320) so clusters participate in those L2 / VLAN segments and subnets.
 
 Full timeline: [docs/evolution.md](docs/evolution.md).  
 RR vs fabric (VLAN exposure, migration impact): [docs/peering-models.md](docs/peering-models.md).

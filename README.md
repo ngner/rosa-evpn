@@ -34,11 +34,11 @@ Migration protocol: pod-network path (Submariner workaround today)
 Hub: MTV forklift drives plans via both APIs
 ```
 
-Historical RR diagram and apply notes: `route-reflector-example/` + [docs/evolution.md](docs/evolution.md).
-
 ![Same-IP live migrate topology across on-prem, EVPN fabric, and ROSA](docs/images/same-ip-live-migrate-topology.png)
 
 *Same-IP live migrate on fabric-aligned CUDNs (e.g. green-319); Submariner/workaround detail: [docs/migration.md](docs/migration.md).*
+
+Historical RR diagram and apply notes: `route-reflector-example/` + [docs/evolution.md](docs/evolution.md).
 
 ## Workarounds (temporary)
 
@@ -46,7 +46,7 @@ Historical RR diagram and apply notes: `route-reflector-example/` + [docs/evolut
 |------------|------------------|-----------------|
 | Submariner between clusters | Live-mig listener is a foreign **pod** IP | MTV / Virt supported cross-cluster path |
 | Cold land on default network, then move to CUDN | Cold path assumes default UDN | MTV + Network/CUDN-aware plans |
-| Containerlab RR | No inbound BGP on FRR-k8s | Inbound :179 or supported RR story (RFE-4) |
+| Containerlab RR | No inbound BGP on FRR-k8s | https://github.com/openshift/evpn-gateway-appliance |
 
 Details: [docs/migration.md](docs/migration.md).
 
